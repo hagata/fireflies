@@ -1,9 +1,11 @@
 
 void loop() {
-//*****
-//  ACCELEROMETER
-//*****
-  
+  //*****
+  //  ACCELEROMETER
+  //*****
+
+  tapType=0;
+
   //Reading 6 bytes of data starting at register DATAX0 will retrieve the x,y and z acceleration values from the ADXL345.
   //The results of the read operation will get stored to the values[] buffer.
   readRegister(DATAX0, 6, values);
@@ -22,27 +24,71 @@ void loop() {
   xg = x * 0.0078;
   yg = y * 0.0078;
   zg = z * 0.0078;
-  
-  if (xg >1 && xg < 1.999 ) {
+
+  //Print Basic Data
+  /*
+  Serial.print(tapType+", ");
+   Serial.print(xg);
+   Serial.print(',');
+   Serial.print(yg);
+   Serial.print(',');
+   Serial.println(zg);
+   */
+
+  //Send This Data
+  //  FIRST -- Check to see if MAX is connected before doing anything
+  if(Serial.available()){
+    serialvalue = Serial.read(); //read the Data from MAX
+    started =1; //turn everything on.
+  }
+
+  //If MAX IS connected...
+  if (started){ 
+    Serial.println(counter);
+//    Serial.print(\n);
+ 
+  }
+ 
+//In Use
+  if(xg > 0.05){
+    usetime = millis();
+    counter ++;
+  }
+  if((millis() - usetime) >= idletime){
+    //do nothing but reduce the counter if it is above 0
+    counter -=3;
+    if (counter >= 1){
+
+      runleds();
+    }
+    if (counter < 0){
+      counter = 0;
+   
+    }
+  }
+
+
+
+
+  if (xg >.3 && xg < 1.999 ) {
     Serial.print("ONE G, ");
-   Serial.println(xg, DEC);
+    Serial.println(xg, DEC);
+    runleds();
+
   }
-  
-    if (xg >2 && xg < 2.999 ) {
+
+  if (xg >2 && xg < 2.999 ) {
     Serial.print("TWO Gs, ");
-   Serial.println(xg, DEC);
+    Serial.println(xg, DEC);
   }
+
 
 
   if(tapType > 0)
   {
     if(tapType == 1){
       Serial.println("SINGLE");
-      Serial.print(x);
-      Serial.print(',');
-      Serial.print(y);
-      Serial.print(',');
-      Serial.println(z);
+
     }
     else{
       Serial.println("DOUBLE");
@@ -53,31 +99,24 @@ void loop() {
       Serial.print((float)zg,2);
       Serial.println("g");
     }
-    detachInterrupt(2);
-    delay(500);
+    detachInterrupt(0);
+    delay(10);
     attachInterrupt(2, tap, RISING);
-//    intType=0;    
+    //    intType=0;    
   }
-  delay(10);
-  
-// *****
-//  LEDS
-// *****
-  for (int j = 0; j < 10; j++) {
-    //load the light sequence you want from array
-    dataRED = dataArrayRED[j];
-    dataGREEN = dataArrayGREEN[j];
-    //ground latchPin and hold low for as long as you are transmitting
-    digitalWrite(latchPin, 0);
-    //move 'em out
-    shiftOut(dataPin, clockPin, dataGREEN);   
-    shiftOut(dataPin, clockPin, dataRED);
-    //return the latch pin high to signal chip that it 
-    //no longer needs to listen for information
-    digitalWrite(latchPin, 1);
-    delay(300);
-  }
+  delay(10); 
+
+
+
+
+  // *****
+  //  LEDS
+  // *****
+
 }
+
+
+
 
 
 

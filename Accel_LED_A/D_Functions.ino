@@ -47,9 +47,10 @@ void readRegister(char registerAddress, int numBytes, char * values){
 void tap(void){
   //Clear the interrupts on the ADXL345
   readRegister(INT_SOURCE, 1, values); 
-  if(values[0] & (1<<5))tapType=2;
-  else tapType=1;
-  ;
+  counter ++;
+//  if(values[0] & (1<<5))tapType=2;
+//  else tapType=1;
+//  ;
 }
 
 // *****
@@ -100,6 +101,13 @@ void shiftOut(int myDataPin, int myClockPin, byte myDataOut) {
 
   //stop shifting
   digitalWrite(myClockPin, 0);
+  
+      if (counter < 0){
+      counter = 0;
+       digitalWrite(myDataPin, LOW);
+       digitalWrite(myClockPin, 1);
+       digitalWrite(myDataPin, 0);
+    }
 }
 
 
@@ -109,14 +117,16 @@ void shiftOut(int myDataPin, int myClockPin, byte myDataOut) {
 //has its full visual effect.
 void blinkAll_2Bytes(int n, int d) {
   digitalWrite(latchPin, 0);
+  int brightness = 10;
+  brightness += 20;
   shiftOut(dataPin, clockPin, 0);
   shiftOut(dataPin, clockPin, 0);
   digitalWrite(latchPin, 1);
-  delay(200);
+  delay(10);
   for (int x = 0; x < n; x++) {
     digitalWrite(latchPin, 0);
-    shiftOut(dataPin, clockPin, 255);
-    shiftOut(dataPin, clockPin, 255);
+    shiftOut(dataPin, clockPin, brightness);
+    shiftOut(dataPin, clockPin, brightness);
     digitalWrite(latchPin, 1);
     delay(d);
     digitalWrite(latchPin, 0);
@@ -126,3 +136,20 @@ void blinkAll_2Bytes(int n, int d) {
     delay(d);
   }
 }
+
+  void runleds() {
+    for (int j = 0; j < 10; j++) {
+      //load the light sequence you want from array
+      dataRED = dataArrayRED[j];
+      dataGREEN = dataArrayGREEN[j];
+      //ground latchPin and hold low for as long as you are transmitting
+      digitalWrite(latchPin, 0);
+      //move 'em out
+      shiftOut(dataPin, clockPin, dataGREEN);   
+      shiftOut(dataPin, clockPin, dataRED);
+      //return the latch pin high to signal chip that it 
+      //no longer needs to listen for information
+//      digitalWrite(latchPin, 1);
+      delay(5);
+    }
+  }

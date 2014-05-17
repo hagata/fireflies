@@ -15,7 +15,7 @@ void setup() {
   digitalWrite(CS, HIGH);
 
   //Create an interrupt that will trigger when a tap is detected.
-  attachInterrupt(2, tap, RISING);
+  attachInterrupt(2, runleds, RISING);
 
   //Put the ADXL345 into +/- 4G range by writing the value 0x01 to the DATA_FORMAT register.
   writeRegister(DATA_FORMAT, 0x01);
@@ -81,6 +81,7 @@ void setup() {
 
   //function that blinks all the LEDs
   //gets passed the number of blinks and the pause time
-  blinkAll_2Bytes(2,500); 
+  
+//  blinkAll_2Bytes(1,500); 
 }
 

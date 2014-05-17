@@ -66,4 +66,12 @@ byte dataArrayRED[10];
 byte dataArrayGREEN[10];
 
 
+//Misc.
+int counter = 0;
+unsigned long usetime;
+unsigned long idletime = 1900;
+unsigned long posttime = 30; //instead of using delay, use millis calculation
+unsigned long previoustime = 0;
 
+int started = 0; // flag for whether we've received serial yet
+int serialvalue; // value for serial input
